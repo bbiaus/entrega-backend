@@ -1,22 +1,17 @@
-import Container from "./containers/Container.js";
 import express from "express";
+import routes from './routes/index.js';
 
-const ProductContainer = new Container("productos");
 const app = express();
 const PORT = 8080;
 
-app.get("/productos", async (req, res) => {
-  const productos = await ProductContainer.getAll();
-  res.send(productos);
-});
+// app.use(express.urlencoded({ extended: true }));
 
-app.get("/productos/random", async (req, res) => {
-  const productos = await ProductContainer.getAll();
-  const cantidadProductos = productos.length
-	const randomIndex = Math.floor(Math.random()*cantidadProductos)
-  res.send(productos[randomIndex]);
-});
+app.listen(PORT, () =>
+  console.log(`Server listening on PORT ${PORT}`)
+);
+// server.on("error", (err) => console.log(`Error: ${err}`));
 
-app.listen(PORT, () => {
-  console.log(`Example app listening on port ${PORT}`);
-});
+app.use("/", routes);
+
+
+export default app;

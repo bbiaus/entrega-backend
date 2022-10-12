@@ -1,4 +1,3 @@
-/* const fs = require("fs") */
 import fs from "fs";
 
 class Container {
@@ -13,10 +12,10 @@ class Container {
 
       return elements;
     } catch (error) {
-      console.log(error);
       if (error.code === "ENOENT") {
         await fs.promises.writeFile(this.filePath, JSON.stringify([], null, 3));
       }
+      throw Error(error);
     }
   }
 
@@ -24,47 +23,77 @@ class Container {
     try {
       const elements = await this.getAll();
 
-      const id = elements.lenght === 0 ? 1 : elements[elements.lenght - 1].id;
-
-      elements.id = id;
+      const id =
+        elements.length === 0 ? 1 : elements[elements.length - 1].id + 1;
+      element.id = id;
 
       elements.push(element);
 
-      await fs.promises.writeFile(this.filePath, JSON.stringify([], null, 3));
+      await fs.promises.writeFile(
+        this.filePath,
+        JSON.stringify(elements, null, 3)
+      );
 
       return element.id;
-    } catch (error) {}
+    } catch (error) {
+      throw Error(error);
+    }
   }
 
   async getById(id) {
     try {
+      const numId = parseInt(id);
       const elements = await this.getAll();
 
-      const foundElement = elements.find(
-        (element) => element.id === parseInt(id)
-      );
+      const foundElement = elements.find((element) => element.id === numId);
 
       if (!foundElement) return null;
 
       return foundElement;
-    } catch (error) {}
+    } catch (error) {
+      throw Error(error);
+    }
+  }
+
+  async updateById(id, element) {
+    try {
+      const numId = parseInt(id);
+
+      await this.deleteById(id);
+
+      const elements = await this.getAll();
+
+      element.id = numId;
+
+      elements.push(element);
+
+      await fs.promises.writeFile(
+        this.filePath,
+        JSON.stringify(elements, null, 3)
+      );
+    } catch (error) {
+      throw Error(error);
+    }
   }
 
   async deleteById(id) {
     try {
+      const numId = parseInt(id);
+
       const elements = await this.getAll();
 
-      const foundElement = elements.find(
-        (element) => element.id === parseInt(id)
-      );
+      const foundElement = elements.find((element) => element.id === numId);
 
       if (!foundElement) return "Element not found";
 
-      const filterElements = elements.filter((element) => element.id !== id);
+      const filterElements = elements.filter((element) => element.id !== numId);
 
-      await fs.promises.writeFile(this.filePath, JSON.stringify([], null, 3));
+      await fs.promises.writeFile(
+        this.filePath,
+        JSON.stringify(filterElements, null, 3)
+      );
     } catch (error) {
-      console.log(error);
+      throw Error(error);
     }
   }
 
@@ -72,7 +101,7 @@ class Container {
     try {
       await fs.promises.writeFile(this.filePath, JSON.stringify([], null, 3));
     } catch (error) {
-      console.log(error);
+      throw Error(error);
     }
   }
 }
