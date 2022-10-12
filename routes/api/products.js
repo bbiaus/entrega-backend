@@ -4,6 +4,7 @@ import Container from "../../containers/Container.js";
 
 const products = express.Router();
 products.use(express.json());
+products.use(express.urlencoded({ extended: true }));
 
 const ProductContainer = new Container("productos");
 
